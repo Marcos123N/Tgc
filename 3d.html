@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mi proyecto Three.js</title>
+    <style>
+      body { margin: 0; overflow: hidden; }
+      canvas { display: block; }
+    </style>
+  </head>
+  <body>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+    <script>
+      // Variables globales
+      var scene, camera, renderer;
+      var spheres = [];
+
+      // Inicialización de la escena
+      function init() {
+        // Crear la escena
+        scene = new THREE.Scene();
+
+        // Crear la cámara
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 10;
+
+        // Crear el renderizador
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Crear el fondo estrellado
+        var starsGeometry = new THREE.Geometry();
+        var starCount = 1000;
+        for (var i = 0; i < starCount; i++) {
+          var star = new THREE.Vector3();
+          star.x = THREE.Math.randFloatSpread(2000);
+          star.y = THREE.Math.randFloatSpread(2000);
+          star.z = THREE.Math.randFloatSpread(2000);
+          starsGeometry.vertices.push(star);
+        }
+        var starsMaterial = new THREE.PointsMaterial({ color: 0xffffff });
+        var stars = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(stars);
+
+        // Crear las esferas
+        var sphereCount = 10;
+
+        for (var i = 0; i < sphereCount; i++) {
+          var geometry = new THREE.SphereGeometry(1, 32, 32);
+          var material = new THREE.MeshBasicMaterial({ color: getRandomColor(), wireframe: true });
+          var sphere = new THREE.Mesh(geometry, material);
+          sphere.position.x = THREE.Math.randFloatSpread(8);
+          sphere.position.y = THREE.Math.randFloatSpread(8);
+          sphere.position.z = THREE.Math.randFloatSpread(8);
+          scene.add(sphere);
+          spheres.push(sphere);
+        }
+
+        // Crear las luces
+        var lightColors = [0xff0000, 0x00ff00, 0x0000ff, 0xff00ff, 0xffff00, 0x00ffff];
+        var lightCount = lightColors.length;
+
+        for (var i = 0; i < lightCount; i++) {
+          var light = new THREE.PointLight(lightColors[i], 2, 10);
+          light.position.x = THREE.Math.randFloatSpread(8);
+          light.position.y = THREE.Math.randFloatSpread(8);
+          light.position.z = THREE.Math.randFloatSpread(8);
+          scene.add(light);
+        }
+
+        // Renderizar la escena
+        render();
+
+        // Redimensionar la escena cuando se cambie el tamaño de la ventana
+        window.addEventListener('resize', onWindowResize, false);
+      }
+
+      // Función de renderizado de la escena
+      function render() {
+        requestAnimationFrame(render);
+
+        for (var i = 0; i < spheres.length; i++) {
+          spheres[i].rotation.x += 0.01;
+          spheres[i].rotation.y += 0.01;
+          spheres[i].rotation.z += 0.01;
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      // Función para generar colores aleatorios llamativos
+      function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      }
+
+      // Función para redimensionar la escena cuando se cambie el tamaño de la ventana
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+      // Llamar a la función de inicialización
+      init();
+    </script>
+  </body>
+</html>
